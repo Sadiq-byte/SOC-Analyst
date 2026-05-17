@@ -1,0 +1,34 @@
+# Investigation 001 — Windows Failed Login Analysis
+
+Date:17/05/2026  
+Analyst:Sadiq Ssali Abdulaziz  
+Tool Used:Splunk  
+Data Source:Windows Event Logs  
+
+#Alert Investigated
+EventCode 4625 — Failed Login Attempts
+
+# Findings
+- 3 failed login attempts detected at 08:00
+- Logon Type: 2 (local keyboard, not remote)
+- Failure Reason: Unknown username or bad password
+- 402 successful logins across 12 accounts
+- Two versions of account name found: sadiq and SADIQ$
+  - sadiq = normal user account
+  - SADIQ$ = machine account (expected behaviour)
+
+#SPL Queries Used
+Index*= | head 20
+Index*= EventCode=4625
+Index*= EventCode=4624 | stats account by Account_name
+#Verdict
+No malicious activity detected.
+False positive — likely accidental password mistype.
+No escalation required.
+
+# What I Learned
+- EventCode 4625 = failed login
+- EventCode 4624 = successful login
+- Logon Type 2 = local, Type 3 = network, Type 10 = RDP
+- ACCOUNT$ with dollar sign = machine account, not human
+- How to use SPL stats and table commands in Splunk
