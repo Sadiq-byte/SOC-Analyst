@@ -1,0 +1,79 @@
+# Investigation 002 — Wireshark PCAP Traffic Analysis
+
+Date: 18/05/2026  
+Analyst:Sadiq Ssali Abdulaziz  
+Tool Used:Wireshark  
+Data Source: PCAP file — 2014-11-08 traffic analysis exercise  
+Source: malware-traffic-analysis.net  
+
+ Overview
+Analysed a packet capture file containing 10,205 packets 
+to identify malicious network activity and reconstruct 
+an attack chain.
+
+ Protocol Breakdown
+| Protocol | Percentage |
+|----------|------------|
+| Ethernet | 100% |
+| IPv4 | 100% |
+| TCP | 96% |
+| UDP | 3.1% |
+| HTTP | 5.5% |
+ Suspicious Domains Identified
+| Domain | Requests | Verdict |
+|--------|----------|---------|
+| seedradrivergy.co.vu | 9 | 🚨 Malicious — redirect to exploit |
+| genfaglobal.ga | 1 | 🚨 Malicious — exploit delivery |
+| kentroxarisma.com | 36 | 🚨 Compromised WordPress site |
+| retrocollect.com | 109 | ✅ Legitimate |
+| theastrologyroom.com | 82 | ✅ Legitimate |
+
+
+Victim Machine Details
+- IP Address: 172.16.165.133
+- Operating System: Windows 7
+- Browser: Internet Explorer 8 (outdated, vulnerable)
+- Time of infection:2014-11-08 around 21:25 UTC
+
+ Key Evidence Found
+- HTTP 302 redirect from seedradrivergy.co.vu 
+  to malicious URL containing random hash string
+- Referer header showing victim came from Bing search
+- kentroxarisma.com running vulnerable WordPress 
+  with xmlrpc.php exposed
+- genfaglobal.ga serving lissyanger17.html exploit page
+- All malicious requests made by IE8 on Windows 7
+
+ Attack Type
+-Drive-by Download via Exploit Kit
+Attackers compromised a legitimate WordPress site and 
+injected hidden redirect code. Victims visiting the site 
+were silently redirected through a chain of malicious 
+domains until an exploit was delivered targeting the 
+victim's outdated Internet Explorer 8 browser.
+
+#Wireshark Filters Used
+http
+http.host contains "seedradrivergy"
+http contains "genfaglobal"
+http contains "kentroxarisma"
+http.request.method == "GET"
+
+
+ #Recommendations
+- Never use Internet Explorer 8 — it is end of life 
+  and full of unpatched vulnerabilities
+- Keep browsers updated at all times
+- Use web filtering to block suspicious TLDs like 
+  .ga .vu .tk .pw
+- WordPress sites should be regularly updated and 
+  monitored for malicious injections
+
+#What I Learned
+- How to use Statistics → Protocol Hierarchy in Wireshark
+- How to use Statistics → HTTP → Requests to find domains
+- How to follow TCP streams to read full conversations
+- What a drive-by download exploit kit attack looks like
+- How to identify compromised WordPress sites in traffic
+- How HTTP 302 redirects are used in malware chains
+- Importance of keeping browsers updated
