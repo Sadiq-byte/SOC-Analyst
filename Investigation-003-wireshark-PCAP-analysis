@@ -1,0 +1,66 @@
+# Investigation 003 — Wireshark Exploit Kit Analysis
+
+Date: 19/05/2026
+Analyst: Sadiq Ssali Abdulaziz
+Tool Used: Wireshark
+Data Source: PCAP file - 2014-traffic-analysis-exercise
+Source: Malware-traffic-analysis.net
+
+Overview
+I analysed a packet containing 3053 packets to identify 
+malicious network activities
+
+Protocol Breakdown
+Protocol          Percentage
+Frame             100
+Ethernet          100
+IPv4              98.7
+IPv6              0.7
+TCP               96.7
+TLS               12.2
+HTTP              2.6
+
+Suspicious Domains
+Domain                                Count    Verdict
+www.ciniholland.nl                    20       Compromised
+24corp-shop.com                       3        Malicious
+stand.trustandprobaterealty.com       12       Malicious
+
+Attack Chain
+Step 1: Victim searched Bing for ciniholland.nl
+Step 2: Victim clicked and visited www.ciniholland.nl
+        which was a normal looking but compromised site
+Step 3: ciniholland.nl redirected victim to 24corp-shop.com
+Step 4: 24corp-shop.com redirected victim to
+        stand.trustandprobaterealty.com
+Step 5: Exploit kit delivered SWF, JAR, XML and MP3 
+        exploits to victims browser
+Step 6: Victims outdated IE8 on Windows 7 got infected
+
+Victim Details
+IP Address: 172.16.165.165
+Operating System: Windows 7
+Browser: Internet Explorer 8 which is weak and outdated
+
+Wireshark Filters Used
+http
+http contains "trustandprobaterealty"
+http contains "24corp-shop"
+http contains "ciniholland"
+http.request.method == "GET"
+
+Verdict
+Malicious activity confirmed. Victim visited a normal 
+looking website which was compromised and silently 
+redirected them through two malicious sites until an 
+exploit kit attacked their outdated IE8 browser 
+on Windows 7.
+
+What I Learned
+- How to identify exploit kit traffic
+- SWF and JAR files are used in browser exploits
+- PHPSSESID in URLs is a sign of exploit kit tracking
+- Attackers use redirect chains to hide where the 
+  attack is really coming from
+- Compromised legitimate websites are used as entry 
+  points to avoid suspicion
